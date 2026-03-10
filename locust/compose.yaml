@@ -5,7 +5,7 @@ services:
      - "8089:8089"
     volumes:
       - ./:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --master -H https://mandarin.nicols.uk/composerdemo
+    command: -f /mnt/locust/locustfile.py --master --expect-workers 5 -H https://mandarin.nicols.uk/composerdemo
     extra_hosts:
       - "host.docker.internal:host-gateway" # Ensures resolution works correctly
 
@@ -13,6 +13,9 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    environment:
+      - LOCUST_WORKER_INDEX=0
+      - LOCUST_WORKER_COUNT=5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
@@ -20,6 +23,9 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    environment:
+      - LOCUST_WORKER_INDEX=1
+      - LOCUST_WORKER_COUNT=5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
@@ -27,6 +33,9 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    environment:
+      - LOCUST_WORKER_INDEX=2
+      - LOCUST_WORKER_COUNT=5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
@@ -34,6 +43,9 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    environment:
+      - LOCUST_WORKER_INDEX=3
+      - LOCUST_WORKER_COUNT=5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
@@ -41,6 +53,9 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    environment:
+      - LOCUST_WORKER_INDEX=4
+      - LOCUST_WORKER_COUNT=5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly

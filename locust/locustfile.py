@@ -5,7 +5,7 @@ import time
 import urllib.request
 from collections import defaultdict
 
-from locust import HttpUser, between, events, task
+from locust import HttpUser, LoadTestShape, between, events, task
 from locust.runners import LocalRunner, MasterRunner, WorkerRunner
 from pyquery import PyQuery
 import csv
@@ -28,19 +28,62 @@ TASK_WEIGHT_FETCH_YUI = int(os.getenv("LOCUST_TASK_WEIGHT_FETCH_YUI", "4"))
 TASK_WEIGHT_FETCH_ESM = int(os.getenv("LOCUST_TASK_WEIGHT_FETCH_ESM", "4"))
 TASK_WEIGHT_FETCH_CSS = int(os.getenv("LOCUST_TASK_WEIGHT_FETCH_CSS", "1"))
 TASK_WEIGHT_FETCH_YUI_CSS = int(os.getenv("LOCUST_TASK_WEIGHT_FETCH_YUI_CSS", "1"))
-WARM_CACHE_ENABLED = os.getenv("LOCUST_WARM_CACHE", "0") == "1"
+WARM_CACHE_ENABLED = os.getenv("LOCUST_WARM_CACHE", "1") == "1"
 WARM_CACHE_REPEATS = int(os.getenv("LOCUST_WARM_CACHE_REPEATS", "2"))
 WARM_CACHE_TIMEOUT_SECONDS = int(os.getenv("LOCUST_WARM_CACHE_TIMEOUT", "10"))
 STATIC_BASE_URL = os.getenv("LOCUST_STATIC_BASE_URL", "https://mandarin.nicols.uk/sm").rstrip("/")
 WORKER_INDEX = int(os.getenv("LOCUST_WORKER_INDEX", "-1"))
 WORKER_COUNT = int(os.getenv("LOCUST_WORKER_COUNT", "0"))
+ASSET_VERSION_ENV = os.getenv("LOCUST_ASSET_VERSION")
+ASSET_DEFAULT_AGE_SECONDS = int(os.getenv("LOCUST_ASSET_DEFAULT_AGE_SECONDS", "300"))
+ASSET_MAX_AGE_SECONDS = int(os.getenv("LOCUST_ASSET_MAX_AGE_SECONDS", "86400"))
+ENABLE_LOAD_SHAPE = os.getenv("LOCUST_ENABLE_LOAD_SHAPE", "0") == "1"
 
-START_TIME = time.time()
+SHAPE_WARMUP_DURATION = int(os.getenv("LOCUST_SHAPE_WARMUP_DURATION", "120"))
+SHAPE_WARMUP_USERS = int(os.getenv("LOCUST_SHAPE_WARMUP_USERS", "20"))
+SHAPE_WARMUP_SPAWN = float(os.getenv("LOCUST_SHAPE_WARMUP_SPAWN", "5"))
 
-YUI_URL = f"{STATIC_BASE_URL}/theme/yui_combo.php?rollup/loader-rollup.js"
-AMD_URL = f"{STATIC_BASE_URL}/lib/requirejs.php/{START_TIME}/core/first.js"
-ESM_URL = f"{STATIC_BASE_URL}/core/esm/{START_TIME}/mod_book/test"
-CSS_URL = f"{STATIC_BASE_URL}/theme/styles.php/boost/{START_TIME}_{START_TIME}/all"
+SHAPE_STEADY_DURATION = int(os.getenv("LOCUST_SHAPE_STEADY_DURATION", "600"))
+SHAPE_STEADY_USERS = int(os.getenv("LOCUST_SHAPE_STEADY_USERS", "100"))
+SHAPE_STEADY_SPAWN = float(os.getenv("LOCUST_SHAPE_STEADY_SPAWN", "10"))
+
+SHAPE_RAMPDOWN_DURATION = int(os.getenv("LOCUST_SHAPE_RAMPDOWN_DURATION", "60"))
+SHAPE_RAMPDOWN_USERS = int(os.getenv("LOCUST_SHAPE_RAMPDOWN_USERS", "0"))
+SHAPE_RAMPDOWN_SPAWN = float(os.getenv("LOCUST_SHAPE_RAMPDOWN_SPAWN", "20"))
+
+
+def resolve_asset_version():
+    now = int(time.time())
+    source = "env"
+
+    if ASSET_VERSION_ENV is not None:
+        try:
+            value = int(ASSET_VERSION_ENV)
+        except ValueError as error:
+            raise RuntimeError("LOCUST_ASSET_VERSION must be an integer unix timestamp") from error
+    else:
+        value = now - max(ASSET_DEFAULT_AGE_SECONDS, 1)
+        source = "auto"
+
+    if value >= now:
+        value = now - 1
+
+    age = now - value
+    if age > ASSET_MAX_AGE_SECONDS:
+        print(
+            f"[bench] warning asset_version age={age}s exceeds "
+            f"ASSET_MAX_AGE_SECONDS={ASSET_MAX_AGE_SECONDS}"
+        )
+
+    return str(value), source
+
+
+ASSET_VERSION, ASSET_VERSION_SOURCE = resolve_asset_version()
+
+YUI_URL = f"{STATIC_BASE_URL}/theme/yui_combo.php?rollup/3.18.1/yui-moodlesimple.js"
+AMD_URL = f"{STATIC_BASE_URL}/lib/requirejs.php/{ASSET_VERSION}/core/first.js"
+ESM_URL = f"{STATIC_BASE_URL}/core/esm/{ASSET_VERSION}/@moodle/lms/mod_book/test"
+CSS_URL = f"{STATIC_BASE_URL}/theme/styles.php/boost/{ASSET_VERSION}_{ASSET_VERSION}/all"
 YUI_CSS_URL = f"{STATIC_BASE_URL}/theme/yui_combo.php?rollup/3.18.1/yui-moodlesimple.css"
 
 
@@ -186,14 +229,21 @@ def on_test_start(environment, **kwargs):
     global run_start_time
 
     if WARM_CACHE_ENABLED and (is_master(environment) or is_local(environment)):
-        warm_static_cache()
+        if is_master(environment) and ASSET_VERSION_SOURCE != "env":
+            print(
+                "[bench] warm-cache disabled on distributed run: "
+                "set LOCUST_ASSET_VERSION to a shared unix timestamp"
+            )
+        else:
+            warm_static_cache()
 
     run_start_time = time.time()
     print(
         f"[bench] run_label={RUN_LABEL} users_loaded={len(users)} "
         f"wait={WAIT_TIME_SECONDS_MIN}-{WAIT_TIME_SECONDS_MAX}s course_id={COURSE_ID} "
         f"weight_anon={ANON_USER_WEIGHT} weight_auth={AUTH_USER_WEIGHT} "
-        f"warm_cache={WARM_CACHE_ENABLED} worker_index={WORKER_INDEX} worker_count={WORKER_COUNT}"
+        f"warm_cache={WARM_CACHE_ENABLED} worker_index={WORKER_INDEX} worker_count={WORKER_COUNT} "
+        f"asset_version={ASSET_VERSION} asset_version_source={ASSET_VERSION_SOURCE}"
     )
 
 
@@ -397,3 +447,31 @@ class AuthenticatedMoodleUser(MoodleBaseUser):
         r = self.client.get(f'/course/view.php?id={COURSE_ID}', name="auth:view_course")
         if VERBOSE:
             print(f"Authenticated view course returned status code {r.status_code}")
+
+
+if ENABLE_LOAD_SHAPE:
+    class ReproducibleBenchmarkShape(LoadTestShape):
+        stages = [
+            {
+                "duration": SHAPE_WARMUP_DURATION,
+                "users": SHAPE_WARMUP_USERS,
+                "spawn_rate": SHAPE_WARMUP_SPAWN,
+            },
+            {
+                "duration": SHAPE_WARMUP_DURATION + SHAPE_STEADY_DURATION,
+                "users": SHAPE_STEADY_USERS,
+                "spawn_rate": SHAPE_STEADY_SPAWN,
+            },
+            {
+                "duration": SHAPE_WARMUP_DURATION + SHAPE_STEADY_DURATION + SHAPE_RAMPDOWN_DURATION,
+                "users": SHAPE_RAMPDOWN_USERS,
+                "spawn_rate": SHAPE_RAMPDOWN_SPAWN,
+            },
+        ]
+
+        def tick(self):
+            run_time = self.get_run_time()
+            for stage in self.stages:
+                if run_time < stage["duration"]:
+                    return (stage["users"], stage["spawn_rate"])
+            return None

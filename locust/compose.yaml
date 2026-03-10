@@ -1,3 +1,37 @@
+x-locust-env: &locust-env
+  LOCUST_RUN_LABEL: ${LOCUST_RUN_LABEL:-baseline}
+  LOCUST_VERBOSE: ${LOCUST_VERBOSE:-0}
+  LOCUST_COURSE_ID: ${LOCUST_COURSE_ID:-14}
+  LOCUST_WAIT_MIN: ${LOCUST_WAIT_MIN:-1}
+  LOCUST_WAIT_MAX: ${LOCUST_WAIT_MAX:-5}
+  LOCUST_WEIGHT_ANON: ${LOCUST_WEIGHT_ANON:-1}
+  LOCUST_WEIGHT_AUTH: ${LOCUST_WEIGHT_AUTH:-1}
+  LOCUST_TASK_WEIGHT_INDEX: ${LOCUST_TASK_WEIGHT_INDEX:-3}
+  LOCUST_TASK_WEIGHT_VIEW_COURSE: ${LOCUST_TASK_WEIGHT_VIEW_COURSE:-2}
+  LOCUST_TASK_WEIGHT_TOGGLE_BLOCK: ${LOCUST_TASK_WEIGHT_TOGGLE_BLOCK:-1}
+  LOCUST_TASK_WEIGHT_FETCH_AMD: ${LOCUST_TASK_WEIGHT_FETCH_AMD:-1}
+  LOCUST_TASK_WEIGHT_FETCH_YUI: ${LOCUST_TASK_WEIGHT_FETCH_YUI:-4}
+  LOCUST_TASK_WEIGHT_FETCH_ESM: ${LOCUST_TASK_WEIGHT_FETCH_ESM:-4}
+  LOCUST_TASK_WEIGHT_FETCH_CSS: ${LOCUST_TASK_WEIGHT_FETCH_CSS:-1}
+  LOCUST_TASK_WEIGHT_FETCH_YUI_CSS: ${LOCUST_TASK_WEIGHT_FETCH_YUI_CSS:-1}
+  LOCUST_WARM_CACHE: ${LOCUST_WARM_CACHE:-1}
+  LOCUST_WARM_CACHE_REPEATS: ${LOCUST_WARM_CACHE_REPEATS:-2}
+  LOCUST_WARM_CACHE_TIMEOUT: ${LOCUST_WARM_CACHE_TIMEOUT:-10}
+  LOCUST_STATIC_BASE_URL: ${LOCUST_STATIC_BASE_URL:-https://mandarin.nicols.uk/sm}
+  LOCUST_ASSET_VERSION: ${LOCUST_ASSET_VERSION:-}
+  LOCUST_ASSET_DEFAULT_AGE_SECONDS: ${LOCUST_ASSET_DEFAULT_AGE_SECONDS:-300}
+  LOCUST_ASSET_MAX_AGE_SECONDS: ${LOCUST_ASSET_MAX_AGE_SECONDS:-86400}
+  LOCUST_ENABLE_LOAD_SHAPE: ${LOCUST_ENABLE_LOAD_SHAPE:-0}
+  LOCUST_SHAPE_WARMUP_DURATION: ${LOCUST_SHAPE_WARMUP_DURATION:-120}
+  LOCUST_SHAPE_WARMUP_USERS: ${LOCUST_SHAPE_WARMUP_USERS:-20}
+  LOCUST_SHAPE_WARMUP_SPAWN: ${LOCUST_SHAPE_WARMUP_SPAWN:-5}
+  LOCUST_SHAPE_STEADY_DURATION: ${LOCUST_SHAPE_STEADY_DURATION:-600}
+  LOCUST_SHAPE_STEADY_USERS: ${LOCUST_SHAPE_STEADY_USERS:-100}
+  LOCUST_SHAPE_STEADY_SPAWN: ${LOCUST_SHAPE_STEADY_SPAWN:-10}
+  LOCUST_SHAPE_RAMPDOWN_DURATION: ${LOCUST_SHAPE_RAMPDOWN_DURATION:-60}
+  LOCUST_SHAPE_RAMPDOWN_USERS: ${LOCUST_SHAPE_RAMPDOWN_USERS:-0}
+  LOCUST_SHAPE_RAMPDOWN_SPAWN: ${LOCUST_SHAPE_RAMPDOWN_SPAWN:-20}
+
 services:
   master:
     build: .
@@ -5,6 +39,8 @@ services:
      - "8089:8089"
     volumes:
       - ./:/mnt/locust
+    environment:
+      <<: *locust-env
     command: -f /mnt/locust/locustfile.py --master --expect-workers 5 -H https://mandarin.nicols.uk/composerdemo
     extra_hosts:
       - "host.docker.internal:host-gateway" # Ensures resolution works correctly
@@ -14,8 +50,9 @@ services:
     volumes:
       - ./:/mnt/locust
     environment:
-      - LOCUST_WORKER_INDEX=0
-      - LOCUST_WORKER_COUNT=5
+      <<: *locust-env
+      LOCUST_WORKER_INDEX: 0
+      LOCUST_WORKER_COUNT: 5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
@@ -24,8 +61,9 @@ services:
     volumes:
       - ./:/mnt/locust
     environment:
-      - LOCUST_WORKER_INDEX=1
-      - LOCUST_WORKER_COUNT=5
+      <<: *locust-env
+      LOCUST_WORKER_INDEX: 1
+      LOCUST_WORKER_COUNT: 5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
@@ -34,8 +72,9 @@ services:
     volumes:
       - ./:/mnt/locust
     environment:
-      - LOCUST_WORKER_INDEX=2
-      - LOCUST_WORKER_COUNT=5
+      <<: *locust-env
+      LOCUST_WORKER_INDEX: 2
+      LOCUST_WORKER_COUNT: 5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
@@ -44,8 +83,9 @@ services:
     volumes:
       - ./:/mnt/locust
     environment:
-      - LOCUST_WORKER_INDEX=3
-      - LOCUST_WORKER_COUNT=5
+      <<: *locust-env
+      LOCUST_WORKER_INDEX: 3
+      LOCUST_WORKER_COUNT: 5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
@@ -54,8 +94,9 @@ services:
     volumes:
       - ./:/mnt/locust
     environment:
-      - LOCUST_WORKER_INDEX=4
-      - LOCUST_WORKER_COUNT=5
+      <<: *locust-env
+      LOCUST_WORKER_INDEX: 4
+      LOCUST_WORKER_COUNT: 5
     command: -f /mnt/locust/locustfile.py --worker --master-host master
     extra_hosts:
       - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly

@@ -48,4 +48,5 @@ Interpretation rule of thumb:
 - `compose.yaml` sets `LOCUST_WORKER_INDEX` and `LOCUST_WORKER_COUNT` per worker so each worker uses a shard of `userlist.csv`.
 - In `compose.yaml`, `master` uses `--expect-workers 5`; keep this value equal to the number of worker services.
 - Cache warmup (`LOCUST_WARM_CACHE=1`) runs once on master/local only; workers do not run warmup.
+- For distributed warm-cache, set a shared `LOCUST_ASSET_VERSION` (unix timestamp) for all containers; otherwise warm-cache is skipped on master.
 - Custom metrics are merged from workers into master via Locust's worker report channel, so the final summary is cluster-wide.

@@ -1,0 +1,46 @@
+services:
+  master:
+    build: .
+    ports:
+     - "8089:8089"
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --master -H https://mandarin.nicols.uk/composerdemo
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Ensures resolution works correctly
+
+  worker1:
+    build: .
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host master
+    extra_hosts:
+      - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
+  worker2:
+    build: .
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host master
+    extra_hosts:
+      - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
+  worker3:
+    build: .
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host master
+    extra_hosts:
+      - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
+  worker4:
+    build: .
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host master
+    extra_hosts:
+      - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly
+  worker5:
+    build: .
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host master
+    extra_hosts:
+      - "mandarin.nicols.uk:host-gateway" # Ensures resolution works correctly

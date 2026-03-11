@@ -12,7 +12,7 @@ import csv
 
 
 USERS_FILE = os.path.join(os.path.dirname(__file__), "userlist.csv")
-COURSE_ID = int(os.getenv("LOCUST_COURSE_ID", "14"))
+COURSE_SHORTNAME = int(os.getenv("LOCUST_COURSE_SHORTNAME", "14"))
 WAIT_TIME_SECONDS_MIN = float(os.getenv("LOCUST_WAIT_MIN", "1"))
 WAIT_TIME_SECONDS_MAX = float(os.getenv("LOCUST_WAIT_MAX", "5"))
 VERBOSE = os.getenv("LOCUST_VERBOSE", "0") == "1"
@@ -240,7 +240,7 @@ def on_test_start(environment, **kwargs):
     run_start_time = time.time()
     print(
         f"[bench] run_label={RUN_LABEL} users_loaded={len(users)} "
-        f"wait={WAIT_TIME_SECONDS_MIN}-{WAIT_TIME_SECONDS_MAX}s course_id={COURSE_ID} "
+        f"wait={WAIT_TIME_SECONDS_MIN}-{WAIT_TIME_SECONDS_MAX}s COURSE_SHORTNAME={COURSE_SHORTNAME} "
         f"weight_anon={ANON_USER_WEIGHT} weight_auth={AUTH_USER_WEIGHT} "
         f"warm_cache={WARM_CACHE_ENABLED} worker_index={WORKER_INDEX} worker_count={WORKER_COUNT} "
         f"asset_version={ASSET_VERSION} asset_version_source={ASSET_VERSION_SOURCE}"
@@ -382,7 +382,7 @@ class AnonymousMoodleUser(MoodleBaseUser):
 
     @task(TASK_WEIGHT_VIEW_COURSE)
     def view_course_anonymous(self):
-        r = self.client.get(f'/course/view.php?id={COURSE_ID}', name="anon:view_course")
+        r = self.client.get(f'/course/view.php?name={COURSE_SHORTNAME}', name="anon:view_course")
         if VERBOSE:
             print(f"Anonymous view course returned status code {r.status_code}")
 
@@ -444,7 +444,7 @@ class AuthenticatedMoodleUser(MoodleBaseUser):
 
     @task(TASK_WEIGHT_VIEW_COURSE)
     def viewCourse(self):
-        r = self.client.get(f'/course/view.php?id={COURSE_ID}', name="auth:view_course")
+        r = self.client.get(f'/course/view.php?name={COURSE_SHORTNAME}', name="auth:view_course")
         if VERBOSE:
             print(f"Authenticated view course returned status code {r.status_code}")
 

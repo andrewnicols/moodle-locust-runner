@@ -18,7 +18,6 @@ x-locust-env: &locust-env
   LOCUST_WARM_CACHE_REPEATS: ${LOCUST_WARM_CACHE_REPEATS:-2}
   LOCUST_WARM_CACHE_TIMEOUT: ${LOCUST_WARM_CACHE_TIMEOUT:-10}
   LOCUST_STATIC_BASE_URL: ${LOCUST_STATIC_BASE_URL:-https://mandarin.nicols.uk/sm}
-  LOCUST_ASSET_VERSION: ${LOCUST_ASSET_VERSION:-}
   LOCUST_ASSET_DEFAULT_AGE_SECONDS: ${LOCUST_ASSET_DEFAULT_AGE_SECONDS:-300}
   LOCUST_ASSET_MAX_AGE_SECONDS: ${LOCUST_ASSET_MAX_AGE_SECONDS:-86400}
   LOCUST_ENABLE_LOAD_SHAPE: ${LOCUST_ENABLE_LOAD_SHAPE:-0}
@@ -31,6 +30,7 @@ x-locust-env: &locust-env
   LOCUST_SHAPE_RAMPDOWN_DURATION: ${LOCUST_SHAPE_RAMPDOWN_DURATION:-60}
   LOCUST_SHAPE_RAMPDOWN_USERS: ${LOCUST_SHAPE_RAMPDOWN_USERS:-0}
   LOCUST_SHAPE_RAMPDOWN_SPAWN: ${LOCUST_SHAPE_RAMPDOWN_SPAWN:-20}
+  LOCUST_TARGET_HOST: ${LOCUST_TARGET_HOST:-http://host.docker.internal:8000}
 
 services:
   master:
@@ -41,7 +41,7 @@ services:
       - ./:/mnt/locust
     environment:
       <<: *locust-env
-    command: -f /mnt/locust/locustfile.py --master --expect-workers 5 -H https://mandarin.nicols.uk/composerdemo
+    command: -f /mnt/locust/locustfile.py --master --expect-workers 5 -H $LOCUST_TARGET_HOST --headless
     extra_hosts:
       - "host.docker.internal:host-gateway" # Ensures resolution works correctly
 

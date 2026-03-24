@@ -31,10 +31,9 @@ TASK_WEIGHT_FETCH_YUI_CSS = int(os.getenv("LOCUST_TASK_WEIGHT_FETCH_YUI_CSS", "1
 WARM_CACHE_ENABLED = os.getenv("LOCUST_WARM_CACHE", "1") == "1"
 WARM_CACHE_REPEATS = int(os.getenv("LOCUST_WARM_CACHE_REPEATS", "2"))
 WARM_CACHE_TIMEOUT_SECONDS = int(os.getenv("LOCUST_WARM_CACHE_TIMEOUT", "10"))
-STATIC_BASE_URL = os.getenv("LOCUST_STATIC_BASE_URL", "https://mandarin.nicols.uk/sm").rstrip("/")
+STATIC_BASE_URL = os.getenv("LOCUST_STATIC_BASE_URL").rstrip("/")
 WORKER_INDEX = int(os.getenv("LOCUST_WORKER_INDEX", "-1"))
 WORKER_COUNT = int(os.getenv("LOCUST_WORKER_COUNT", "0"))
-ASSET_VERSION_ENV = os.getenv("LOCUST_ASSET_VERSION")
 ASSET_DEFAULT_AGE_SECONDS = int(os.getenv("LOCUST_ASSET_DEFAULT_AGE_SECONDS", "300"))
 ASSET_MAX_AGE_SECONDS = int(os.getenv("LOCUST_ASSET_MAX_AGE_SECONDS", "86400"))
 ENABLE_LOAD_SHAPE = os.getenv("LOCUST_ENABLE_LOAD_SHAPE", "1") == "1"
@@ -56,14 +55,8 @@ def resolve_asset_version():
     now = int(time.time())
     source = "env"
 
-    if ASSET_VERSION_ENV is not None:
-        try:
-            value = int(ASSET_VERSION_ENV)
-        except ValueError as error:
-            raise RuntimeError("LOCUST_ASSET_VERSION must be an integer unix timestamp") from error
-    else:
-        value = now - max(ASSET_DEFAULT_AGE_SECONDS, 1)
-        source = "auto"
+    value = now - max(ASSET_DEFAULT_AGE_SECONDS, 1)
+    source = "auto"
 
     if value >= now:
         value = now - 1

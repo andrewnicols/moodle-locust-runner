@@ -41,6 +41,8 @@ services:
     build: .
     ports:
      - "8089:8089"
+    networks:
+      - moodle
     volumes:
       - ./:/mnt/locust
     environment:
@@ -53,6 +55,8 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    networks:
+      - moodle
     environment:
       <<: *locust-env
       LOCUST_WORKER_INDEX: 0
@@ -64,6 +68,8 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    networks:
+      - moodle
     environment:
       <<: *locust-env
       LOCUST_WORKER_INDEX: 1
@@ -75,6 +81,8 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    networks:
+      - moodle
     environment:
       <<: *locust-env
       LOCUST_WORKER_INDEX: 2
@@ -86,6 +94,8 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    networks:
+      - moodle
     environment:
       <<: *locust-env
       LOCUST_WORKER_INDEX: 3
@@ -97,6 +107,8 @@ services:
     build: .
     volumes:
       - ./:/mnt/locust
+    networks:
+      - moodle
     environment:
       <<: *locust-env
       LOCUST_WORKER_INDEX: 4

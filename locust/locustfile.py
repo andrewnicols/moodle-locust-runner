@@ -50,6 +50,7 @@ SHAPE_RAMPDOWN_DURATION = int(os.getenv("LOCUST_SHAPE_RAMPDOWN_DURATION", "60"))
 SHAPE_RAMPDOWN_USERS = int(os.getenv("LOCUST_SHAPE_RAMPDOWN_USERS", "0"))
 SHAPE_RAMPDOWN_SPAWN = float(os.getenv("LOCUST_SHAPE_RAMPDOWN_SPAWN", "20"))
 
+ROUTED_BASE_URL=f"{STATIC_BASE_URL}/r.php"
 
 def resolve_asset_version():
     now = int(time.time())
@@ -75,7 +76,7 @@ ASSET_VERSION, ASSET_VERSION_SOURCE = resolve_asset_version()
 
 YUI_URL = f"{STATIC_BASE_URL}/theme/yui_combo.php?rollup/3.18.1/yui-moodlesimple.js"
 AMD_URL = f"{STATIC_BASE_URL}/lib/requirejs.php/{ASSET_VERSION}/core/first.js"
-ESM_URL = f"{STATIC_BASE_URL}/r.php/core/esm/{ASSET_VERSION}/react"
+ESM_URL = f"{ROUTED_BASE_URL}/core/esm/{ASSET_VERSION}/react"
 CSS_URL = f"{STATIC_BASE_URL}/theme/styles.php/boost/{ASSET_VERSION}_{ASSET_VERSION}/all"
 YUI_CSS_URL = f"{STATIC_BASE_URL}/theme/yui_combo.php?rollup/3.18.1/yui-moodlesimple.css"
 
@@ -375,21 +376,18 @@ class AnonymousMoodleUser(MoodleBaseUser):
 
     @task(TASK_WEIGHT_FETCH_YUI)
     def fetch_yui(self):
-        print(f"Fetching YUI combo from {YUI_URL}")
         r = self.client.get(YUI_URL, name="anon:fetch_yui")
         if r.status_code != 200:
             print(f"Failed to fetch YUI combo with status code {r.status_code}")
 
     @task(TASK_WEIGHT_FETCH_AMD)
     def fetch_amd(self):
-        print(f"Fetching AMD combo from {AMD_URL}")
         r = self.client.get(AMD_URL, name="anon:fetch_amd")
         if r.status_code != 200:
             print(f"Failed to fetch AMD combo with status code {r.status_code}")
 
     @task(TASK_WEIGHT_FETCH_ESM)
     def fetch_esm(self):
-        print(f"Fetching ESM combo from {ESM_URL}")
         r = self.client.get(ESM_URL, name="anon:fetch_esm")
         if r.status_code != 200:
             print(f"Failed to fetch ESM combo with status code {r.status_code}")
@@ -422,12 +420,12 @@ class AuthenticatedMoodleUser(MoodleBaseUser):
     @task(TASK_WEIGHT_TOGGLE_BLOCK)
     def toggleBlock(self):
         self.client.post(
-            '/api/rest/v2/user/current/preferences/drawer-open-block',
+            '/r.php/api/rest/v2/user/current/preferences/drawer-open-block',
             json={"value": True},
             name="auth:toggle_block_on"
         )
         self.client.post(
-            '/api/rest/v2/user/current/preferences/drawer-open-block',
+            '/r.php/api/rest/v2/user/current/preferences/drawer-open-block',
             json={"value": False},
             name="auth:toggle_block_off"
         )

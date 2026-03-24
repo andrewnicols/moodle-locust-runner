@@ -46,7 +46,7 @@ services:
     volumes:
       - type: bind
         source: ./results
-        target: /mnt/locust
+        target: /mnt/locust/results
     environment:
       <<: *locust-env
     command: -f /mnt/locust/locustfile.py --master --expect-workers 5 -H $LOCUST_TARGET_HOST --headless --csv results/results

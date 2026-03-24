@@ -12,7 +12,7 @@ import csv
 
 
 USERS_FILE = os.path.join(os.path.dirname(__file__), "userlist.csv")
-COURSE_SHORTNAME = int(os.getenv("LOCUST_COURSE_SHORTNAME", "C1"))
+COURSE_SHORTNAME = os.getenv("LOCUST_COURSE_SHORTNAME", "C1")
 WAIT_TIME_SECONDS_MIN = float(os.getenv("LOCUST_WAIT_MIN", "1"))
 WAIT_TIME_SECONDS_MAX = float(os.getenv("LOCUST_WAIT_MAX", "5"))
 VERBOSE = os.getenv("LOCUST_VERBOSE", "0") == "1"

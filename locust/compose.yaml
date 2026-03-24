@@ -32,6 +32,10 @@ x-locust-env: &locust-env
   LOCUST_SHAPE_RAMPDOWN_USERS: ${LOCUST_SHAPE_RAMPDOWN_USERS:-0}
   LOCUST_SHAPE_RAMPDOWN_SPAWN: ${LOCUST_SHAPE_RAMPDOWN_SPAWN:-20}
 
+networks:
+  moodle:
+    external: true
+
 services:
   master:
     build: .

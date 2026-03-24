@@ -439,29 +439,28 @@ class AuthenticatedMoodleUser(MoodleBaseUser):
             print(f"Authenticated view course returned status code {r.status_code}")
 
 
-if ENABLE_LOAD_SHAPE:
-    class ReproducibleBenchmarkShape(LoadTestShape):
-        stages = [
-            {
-                "duration": SHAPE_WARMUP_DURATION,
-                "users": SHAPE_WARMUP_USERS,
-                "spawn_rate": SHAPE_WARMUP_SPAWN,
-            },
-            {
-                "duration": SHAPE_WARMUP_DURATION + SHAPE_STEADY_DURATION,
-                "users": SHAPE_STEADY_USERS,
-                "spawn_rate": SHAPE_STEADY_SPAWN,
-            },
-            {
-                "duration": SHAPE_WARMUP_DURATION + SHAPE_STEADY_DURATION + SHAPE_RAMPDOWN_DURATION,
-                "users": SHAPE_RAMPDOWN_USERS,
-                "spawn_rate": SHAPE_RAMPDOWN_SPAWN,
-            },
-        ]
+class ReproducibleBenchmarkShape(LoadTestShape):
+    stages = [
+        {
+            "duration": SHAPE_WARMUP_DURATION,
+            "users": SHAPE_WARMUP_USERS,
+            "spawn_rate": SHAPE_WARMUP_SPAWN,
+        },
+        {
+            "duration": SHAPE_WARMUP_DURATION + SHAPE_STEADY_DURATION,
+            "users": SHAPE_STEADY_USERS,
+            "spawn_rate": SHAPE_STEADY_SPAWN,
+        },
+        {
+            "duration": SHAPE_WARMUP_DURATION + SHAPE_STEADY_DURATION + SHAPE_RAMPDOWN_DURATION,
+            "users": SHAPE_RAMPDOWN_USERS,
+            "spawn_rate": SHAPE_RAMPDOWN_SPAWN,
+        },
+    ]
 
-        def tick(self):
-            run_time = self.get_run_time()
-            for stage in self.stages:
-                if run_time < stage["duration"]:
-                    return (stage["users"], stage["spawn_rate"])
-            return None
+    def tick(self):
+        run_time = self.get_run_time()
+        for stage in self.stages:
+            if run_time < stage["duration"]:
+                return (stage["users"], stage["spawn_rate"])
+        return None

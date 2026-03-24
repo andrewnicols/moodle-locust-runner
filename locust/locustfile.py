@@ -75,7 +75,7 @@ ASSET_VERSION, ASSET_VERSION_SOURCE = resolve_asset_version()
 
 YUI_URL = f"{STATIC_BASE_URL}/theme/yui_combo.php?rollup/3.18.1/yui-moodlesimple.js"
 AMD_URL = f"{STATIC_BASE_URL}/lib/requirejs.php/{ASSET_VERSION}/core/first.js"
-ESM_URL = f"{STATIC_BASE_URL}/r.php/core/esm/{ASSET_VERSION}/@moodle/lms/mod_book/test"
+ESM_URL = f"{STATIC_BASE_URL}/r.php/core/esm/{ASSET_VERSION}/react"
 CSS_URL = f"{STATIC_BASE_URL}/theme/styles.php/boost/{ASSET_VERSION}_{ASSET_VERSION}/all"
 YUI_CSS_URL = f"{STATIC_BASE_URL}/theme/yui_combo.php?rollup/3.18.1/yui-moodlesimple.css"
 

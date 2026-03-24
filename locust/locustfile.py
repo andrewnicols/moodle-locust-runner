@@ -29,7 +29,7 @@ TASK_WEIGHT_FETCH_ESM = int(os.getenv("LOCUST_TASK_WEIGHT_FETCH_ESM", "4"))
 TASK_WEIGHT_FETCH_CSS = int(os.getenv("LOCUST_TASK_WEIGHT_FETCH_CSS", "1"))
 TASK_WEIGHT_FETCH_YUI_CSS = int(os.getenv("LOCUST_TASK_WEIGHT_FETCH_YUI_CSS", "1"))
 WARM_CACHE_ENABLED = os.getenv("LOCUST_WARM_CACHE", "1") == "1"
-WARM_CACHE_REPEATS = int(os.getenv("LOCUST_WARM_CACHE_REPEATS", "2"))
+WARM_CACHE_REPEATS = int(os.getenv("LOCUST_WARM_CACHE_REPEATS", "0"))
 WARM_CACHE_TIMEOUT_SECONDS = int(os.getenv("LOCUST_WARM_CACHE_TIMEOUT", "10"))
 STATIC_BASE_URL = os.getenv("LOCUST_STATIC_BASE_URL").rstrip("/")
 WORKER_INDEX = int(os.getenv("LOCUST_WORKER_INDEX", "-1"))
@@ -75,7 +75,7 @@ ASSET_VERSION, ASSET_VERSION_SOURCE = resolve_asset_version()
 
 YUI_URL = f"{STATIC_BASE_URL}/theme/yui_combo.php?rollup/3.18.1/yui-moodlesimple.js"
 AMD_URL = f"{STATIC_BASE_URL}/lib/requirejs.php/{ASSET_VERSION}/core/first.js"
-ESM_URL = f"{STATIC_BASE_URL}/core/esm/{ASSET_VERSION}/@moodle/lms/mod_book/test"
+ESM_URL = f"{STATIC_BASE_URL}/r.php/core/esm/{ASSET_VERSION}/@moodle/lms/mod_book/test"
 CSS_URL = f"{STATIC_BASE_URL}/theme/styles.php/boost/{ASSET_VERSION}_{ASSET_VERSION}/all"
 YUI_CSS_URL = f"{STATIC_BASE_URL}/theme/yui_combo.php?rollup/3.18.1/yui-moodlesimple.css"
 

@@ -221,14 +221,8 @@ def is_local(environment):
 def on_test_start(environment, **kwargs):
     global run_start_time
 
-    if WARM_CACHE_ENABLED and (is_master(environment) or is_local(environment)):
-        if is_master(environment) and ASSET_VERSION_SOURCE != "env":
-            print(
-                "[bench] warm-cache disabled on distributed run: "
-                "set LOCUST_ASSET_VERSION to a shared unix timestamp"
-            )
-        else:
-            warm_static_cache()
+    if WARM_CACHE_ENABLED:
+        warm_static_cache()
 
     run_start_time = time.time()
     print(

@@ -375,18 +375,21 @@ class AnonymousMoodleUser(MoodleBaseUser):
 
     @task(TASK_WEIGHT_FETCH_YUI)
     def fetch_yui(self):
+        print(f"Fetching YUI combo from {YUI_URL}")
         r = self.client.get(YUI_URL, name="anon:fetch_yui")
         if r.status_code != 200:
             print(f"Failed to fetch YUI combo with status code {r.status_code}")
 
     @task(TASK_WEIGHT_FETCH_AMD)
     def fetch_amd(self):
+        print(f"Fetching AMD combo from {AMD_URL}")
         r = self.client.get(AMD_URL, name="anon:fetch_amd")
         if r.status_code != 200:
             print(f"Failed to fetch AMD combo with status code {r.status_code}")
 
     @task(TASK_WEIGHT_FETCH_ESM)
     def fetch_esm(self):
+        print(f"Fetching ESM combo from {ESM_URL}")
         r = self.client.get(ESM_URL, name="anon:fetch_esm")
         if r.status_code != 200:
             print(f"Failed to fetch ESM combo with status code {r.status_code}")

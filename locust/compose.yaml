@@ -49,7 +49,7 @@ services:
         target: /mnt/locust
     environment:
       <<: *locust-env
-    command: -f /mnt/locust/locustfile.py --master --expect-workers 5 -H $LOCUST_TARGET_HOST --headless --csv results
+    command: -f /mnt/locust/locustfile.py --master --expect-workers 5 -H $LOCUST_TARGET_HOST --headless --csv results/results
     extra_hosts:
       - "host.docker.internal:host-gateway" # Ensures resolution works correctly
 

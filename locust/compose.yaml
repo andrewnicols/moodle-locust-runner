@@ -44,6 +44,7 @@ services:
     networks:
       - moodle
     volumes:
+      - ./:/mnt/locust
       - type: bind
         source: ./results
         target: /mnt/locust/results
